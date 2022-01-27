@@ -2,7 +2,7 @@ __pycache__
 .venv
 fips_servlet
 main.spec
-poetry.loc
+poetry.lock
 proxy.txt
 pyproject.toml
 test.py
