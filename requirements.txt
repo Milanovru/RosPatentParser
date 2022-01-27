@@ -1,0 +1,9 @@
+requests==2.27.1
+fake-useragent==0.1.11
+bs4==0.0.1
+Pillow==9.0.0
+pytesseract==0.3.8
+pandas==1.4.0
+lxml==4.7.1
+openpyxl==3.0.9
+loguru==0.5.3
