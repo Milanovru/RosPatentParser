@@ -7,3 +7,4 @@ proxy.txt
 pyproject.toml
 test.py
 logs/
+output_data.lxml
