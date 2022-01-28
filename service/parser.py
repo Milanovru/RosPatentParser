@@ -28,7 +28,7 @@ def set_info(text):
     txt.insert(INSERT, text)
 
 app = Tk()
-app.title('RusPatentParser v0.2.0')
+app.title('RusPatentParser v0.2.1')
 app.geometry("500x400")
 app.grid_rowconfigure(0, weight=0)
 
@@ -159,7 +159,11 @@ class Parser:
         self.COUNT = 1
 
     def _create_document(self):
-        set_info('идет запись в файл\n')
         data = self.exel_writer.generate_data(self.document_data)
-        self.exel_writer.write_to_exel(data)
-        messagebox.showinfo('Системное сообщение', 'Обработка завершена: результаты сохранены в файле output_data.xlsx!')
+        try:
+            set_info('идет запись в файл\n')
+            self.exel_writer.write_to_exel(data)
+            messagebox.showinfo('Системное сообщение', 'Обработка завершена: результаты сохранены в файле output_data.xlsx!')
+        except Exception as e:
+            messagebox.showinfo('Системное сообщение', 'Ошибка при записи в файл!')
+            logger.error(e)
