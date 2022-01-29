@@ -38,9 +38,16 @@ class ExelWriter:
 }
 
     def write_to_exel(self, data: dict):
-        data_file = pd.DataFrame(data)
-        data_file.to_excel('output_data.xlsx', index=False, sheet_name='Sheet1')
-        self._set_default()
+        exel_data = None
+        try:
+            exel_data = pd.read_excel('output_data.xlsx')
+        except:
+            pass
+        finally:
+            new_data = pd.DataFrame(data)
+            data_file = pd.concat([exel_data, new_data])
+            data_file.to_excel('output_data.xlsx', index=False)
+            self._set_default()
         
     def _set_default(self):
         self.id_list = []
