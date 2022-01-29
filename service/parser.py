@@ -28,7 +28,7 @@ def set_info(text):
     txt.insert(INSERT, text)
 
 app = Tk()
-app.title('RusPatentParser v0.2.1')
+app.title('RusPatentParser v0.2.2')
 app.geometry("500x400")
 app.grid_rowconfigure(0, weight=0)
 
@@ -74,48 +74,47 @@ class Parser:
         self.LEN = end_index - start_index
         
     def _get_data(self, html):
-        doc = html.find('td', {'class': 'White'})
-        doc_list = html.find_all('p', {'class': 'bib'})
-        # Принято решение об отказе в регистрации (последнее изменение: 20.08.2020)
-        text = ' '.join(doc.text.split())[28:]
-        check = text.find('Принято решение об отказе в регистрации')
-        if check != -1:
-            set_info('Парсинг страницы...\n')
-            self.status = text[:39]
-            self.data = text[62:-1]
-            for item in doc_list:
-                valid_data = ' '.join(item.text.split())
-                if valid_data[1:4] == '210':
-                    self.number = item.find('b').text
-                if valid_data[1:4] == '540':
-                    url = item.find('a').get('href')[:-3]
-                    link_gif = url+'GIF'
-                if valid_data[1:4] == '731':
-                    self.applicant = item.find('b').text
-                if valid_data[1:4] == '740':
-                    self.representative = item.find('b').text
-                if valid_data[1:4] == '750':
-                    self.address = item.find('b').text  # 191186, Санкт-Петербург, а/я 142, Н.И. Петровой
-            set_info('Обработка изображения...\n')
-            img_data = self.image_ocr.exstract_data(link_gif)
-            self.document_data.append({
-                'id': self.number,
-                'status': self.status,
-                'data': self.data,
-                'applicant': self.applicant,
-                'representative': self.representative,
-                'address': self.address,
-                'phone': img_data[0],
-                'fax': img_data[1],
-                'email': img_data[2]
-            })
-
-            self.number = ''
-            self.applicant = ''
-            self.representative = 'не является патентным поверенным'
-            self.address = ''
-            self.status = ''
-            self.data = ''
+            doc = html.find('td', {'class': 'White'})
+            doc_list = html.find_all('p', {'class': 'bib'})
+            # Принято решение об отказе в регистрации (последнее изменение: 20.08.2020)
+            text = ' '.join(doc.text.split())[28:]
+            check = text.find('Принято решение об отказе в регистрации')
+            if check != -1:
+                set_info('Парсинг страницы...\n')
+                self.status = text[:39]
+                self.data = text[62:-1]
+                for item in doc_list:
+                    valid_data = ' '.join(item.text.split())
+                    if valid_data[1:4] == '210':
+                        self.number = item.find('b').text
+                    if valid_data[1:4] == '540':
+                        url = item.find('a').get('href')[:-3]
+                        link_gif = url+'GIF'
+                    if valid_data[1:4] == '731':
+                        self.applicant = item.find('b').text
+                    if valid_data[1:4] == '740':
+                        self.representative = item.find('b').text
+                    if valid_data[1:4] == '750':
+                        self.address = item.find('b').text  # 191186, Санкт-Петербург, а/я 142, Н.И. Петровой
+                set_info('Обработка изображения...\n')
+                img_data = self.image_ocr.exstract_data(link_gif)
+                self.document_data.append({
+                    'id': self.number,
+                    'status': self.status,
+                    'data': self.data,
+                    'applicant': self.applicant,
+                    'representative': self.representative,
+                    'address': self.address,
+                    'phone': img_data[0],
+                    'fax': img_data[1],
+                    'email': img_data[2]
+                })
+                self.number = ''
+                self.applicant = ''
+                self.representative = 'не является патентным поверенным'
+                self.address = ''
+                self.status = ''
+                self.data = ''
         
     def parse(self):
         with requests.Session() as s:
@@ -146,7 +145,7 @@ class Parser:
                         except Exception as e:
                             logger.error(f'№ {id}: {e}')
                             messagebox.showinfo('Системное сообщение', 'Аварийная остановка приложения.')
-                            break              
+                            break             
                 else:
                     set_info(r.status_code)
                 self.COUNT += 1

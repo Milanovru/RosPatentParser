@@ -8,3 +8,4 @@ pyproject.toml
 test.py
 logs/
 output_data.lxml
+.DS_Store

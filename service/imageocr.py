@@ -5,7 +5,7 @@ import io
 import requests
 
 
-# pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 class ImageOcr:
 
@@ -19,7 +19,7 @@ class ImageOcr:
                 r = s.get(url, stream=True)
                 byteImgIO = io.BytesIO(r.content)
                 img = Image.open(byteImgIO)
-                img_crop = img.crop((410, 205, 750, 405))
+                img_crop = img.crop((405, 205, 750, 405))
                 reader = pytesseract.image_to_string(img_crop, lang='rus+eng')
                 return reader
             except Exception:
@@ -28,22 +28,29 @@ class ImageOcr:
     def exstract_data(self, url):
         file_data = self._read_img(url)
         if file_data != '0':
-            format_data = ' '.join(file_data.split())
+            format_data = ' '.join(file_data.split()).lower()
             try:
                 tel = re.search(r'(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}', format_data)
-                self.tel = (tel.group(0))
+                self.tel = tel.group(0)
             except AttributeError:
-                self.tel = 'данные не распознаны'
+                self.tel = ''
             try:
-                fax = re.search(r'Факс:\s[(]*\d{3}[)]\s\d{3}[\s-]\d{2}[\s-]\d{2}', format_data)
-                self.fax = (fax.group(0))
+                start_idx = re.search(r'факс: |факс ', format_data)
+                end_idx = re.search(r'e-mail: |e-mail ', format_data)
+                search_fax = format_data[start_idx.end():end_idx.start()]
+                fax = re.search(r'(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}', search_fax)
+                self.fax = fax.group(0)
             except AttributeError:
-                self.fax = 'данные не распознаны'
+                self.fax = ''
             try:
-                email = re.search(r'\w+@\w+\.\w+', format_data)
-                self.email = (email.group(0))
+                start_idx = re.search(r'e-mail: |e-mail ', format_data)
+                format_data = format_data[start_idx.end():]
+                re_text = re.sub(r'\.', '_', format_data)
+                text = re.search(r'\w+[@|\s@]\w+\_\w+', re_text)
+                email = text.group(0)
+                self.email = email.replace('_', '.')
             except AttributeError:
-                self.email = 'данные не распознаны'
+                self.email = '-'
             return self.tel, self.fax, self.email
         else:
             return 'ошибка при загрузке', 'ошибка при загрузке', 'ошибка при загрузке'

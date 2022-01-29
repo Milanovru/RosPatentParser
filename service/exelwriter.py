@@ -39,7 +39,7 @@ class ExelWriter:
 
     def write_to_exel(self, data: dict):
         data_file = pd.DataFrame(data)
-        data_file.to_excel(f'output_data.xlsx', index=False)
+        data_file.to_excel('output_data.xlsx', index=False, sheet_name='Sheet1')
         self._set_default()
         
     def _set_default(self):
