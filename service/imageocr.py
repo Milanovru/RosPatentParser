@@ -19,7 +19,7 @@ class ImageOcr:
                 r = s.get(url, stream=True)
                 byteImgIO = io.BytesIO(r.content)
                 img = Image.open(byteImgIO)
-                img_crop = img.crop((405, 205, 750, 405))
+                img_crop = img.crop((405, 205, 760, 428))
                 reader = pytesseract.image_to_string(img_crop, lang='rus+eng')
                 return reader
             except Exception:

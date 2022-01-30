@@ -122,7 +122,7 @@ class Parser:
                 set_info(f'Страница {self.COUNT}/{self.LEN+1}\n')
                 headers = {'User-Agent': ua.random}
                 proxies = {'http': f'http://{random.choice(proxy)}'}
-                set_info(f"{proxies['http']}\n")
+                #set_info(f"{proxies['http']}\n")
                 url = f'https://www1.fips.ru/registers-doc-view/fips_servlet?DB=RUTMAP&DocNumber={id}&TypeFile=html'
                 r = s.get(url=url, headers=headers, proxies=proxies)
                 if r.status_code == 200: 
@@ -139,6 +139,10 @@ class Parser:
                             logger.error(f'№ {id}: {e}')
                             messagebox.showinfo('Системное сообщение', 'Аварийная остановка приложения.')
                             break
+                    elif soup.text == 'Превышен допустимый предел количества просмотров документов из реестра в день.':
+                        logger.warning(f'№ {id}:{soup.text}')
+                        messagebox.showinfo('Системное сообщение', 'Аварийная остановка приложения.')
+                        break
                     else:
                         try:
                             self._get_data(soup)
