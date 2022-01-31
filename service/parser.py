@@ -25,7 +25,10 @@ def clicked():
 
 def set_info(text):
     txt.insert(INSERT, text)
-
+    
+def clear_info():
+    txt.delete('1.0', END)
+    
 app = Tk()
 app.title('RusPatentParser v0.2.3')
 app.geometry("500x400")
@@ -42,7 +45,7 @@ ent1.focus()
 ent2 = Entry(app, width=15)
 ent2.grid(column=1, row=1)
 
-txt = scrolledtext.ScrolledText(app, width=60, height=15)  
+txt = scrolledtext.ScrolledText(app, width=60, height=15)
 txt.grid(column=0, row=3, columnspan=3)
 
 btn = Button(app, text='Поиск', command=clicked)
@@ -160,6 +163,8 @@ class Parser:
                 self.COUNT += 1
                 set_info('Ожидание следующего подключения...\n')
                 time.sleep(4)
+                if id % 3 == 0:  # чистит экран
+                    clear_info()
                 
         self._create_document()
         self.document_data = []
