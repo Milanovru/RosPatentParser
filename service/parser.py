@@ -27,7 +27,7 @@ def set_info(text):
     txt.insert(INSERT, text)
 
 app = Tk()
-app.title('RusPatentParser v0.2.2')
+app.title('RusPatentParser v0.2.3')
 app.geometry("500x400")
 app.grid_rowconfigure(0, weight=0)
 
