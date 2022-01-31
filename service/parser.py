@@ -119,11 +119,12 @@ class Parser:
         proxy_len = len(proxies)
         proxy = {'http': f'http://{proxies[proxy_idx]}'}
         with requests.Session() as s:
+            s.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0'})
             for id in range(self.start_index, self.end_index+1):
                 set_info(f'Страница {self.COUNT}/{self.LEN+1}\n')
-                headers = {'User-Agent': ua.random}
+                #http://icanhazip.com/
                 url = f'https://www1.fips.ru/registers-doc-view/fips_servlet?DB=RUTMAP&DocNumber={id}&TypeFile=html'
-                r = s.get(url=url, headers=headers, proxies=proxy)
+                r = s.get(url=url, proxies=proxy)
                 if r.status_code == 200: 
                     soup = BeautifulSoup(r.text, 'lxml')
                     if soup.text  == 'Документ с данным номером отсутствует':
@@ -159,7 +160,7 @@ class Parser:
                 self.COUNT += 1
                 set_info('Ожидание следующего подключения...\n')
                 time.sleep(4)
-
+                
         self._create_document()
         self.document_data = []
         self.LEN = 0
