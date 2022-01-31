@@ -2,17 +2,16 @@ import requests
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 import time
-import random
 from .imageocr import ImageOcr
 from .exelwriter import ExelWriter
 from tkinter import *
+from tkinter import messagebox
 from tkinter import scrolledtext
 from threading import Thread
-from tkinter import messagebox
 from loguru import logger
 
 
-proxy = open('proxy.txt').read().split('\n')
+proxies = open('proxy.txt').read().split('\n')
 ua = UserAgent()
 
 logger.add(f'logs/logs.log', format='{time} {level} {message}',
@@ -43,7 +42,6 @@ ent1.focus()
 ent2 = Entry(app, width=15)
 ent2.grid(column=1, row=1)
 
-# bar = Progressbar(app, length=20).grid(column=0, row=2, rowspan=2)
 txt = scrolledtext.ScrolledText(app, width=60, height=15)  
 txt.grid(column=0, row=3, columnspan=3)
 
@@ -117,14 +115,15 @@ class Parser:
                 self.data = ''
         
     def parse(self):
+        proxy_idx = 0
+        proxy_len = len(proxies)
+        proxy = {'http': f'http://{proxies[proxy_idx]}'}
         with requests.Session() as s:
             for id in range(self.start_index, self.end_index+1):
                 set_info(f'Страница {self.COUNT}/{self.LEN+1}\n')
                 headers = {'User-Agent': ua.random}
-                proxies = {'http': f'http://{random.choice(proxy)}'}
-                #set_info(f"{proxies['http']}\n")
                 url = f'https://www1.fips.ru/registers-doc-view/fips_servlet?DB=RUTMAP&DocNumber={id}&TypeFile=html'
-                r = s.get(url=url, headers=headers, proxies=proxies)
+                r = s.get(url=url, headers=headers, proxies=proxy)
                 if r.status_code == 200: 
                     soup = BeautifulSoup(r.text, 'lxml')
                     if soup.text  == 'Документ с данным номером отсутствует':
@@ -141,8 +140,13 @@ class Parser:
                             break
                     elif soup.text == 'Превышен допустимый предел количества просмотров документов из реестра в день.':
                         logger.warning(f'№ {id}:{soup.text}')
-                        messagebox.showinfo('Системное сообщение', 'Аварийная остановка приложения.')
-                        break
+                        proxy_idx += 1
+                        if proxy_idx <= proxy_len:
+                            logger.info('изменен proxy')
+                            continue
+                        else:
+                            messagebox.showinfo('Системное сообщение', 'Закончились proxy. Превышен допустимый предел количества просмотров документов.')
+                            break    
                     else:
                         try:
                             self._get_data(soup)

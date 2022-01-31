@@ -5,7 +5,7 @@ import io
 import requests
 
 
-pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+# pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 class ImageOcr:
 
@@ -23,11 +23,11 @@ class ImageOcr:
                 reader = pytesseract.image_to_string(img_crop, lang='rus+eng')
                 return reader
             except Exception:
-                return '0'
+                return None
 
     def exstract_data(self, url):
         file_data = self._read_img(url)
-        if file_data != '0':
+        if file_data != None:
             format_data = ' '.join(file_data.split()).lower()
             try:
                 tel = re.search(r'(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}', format_data)
@@ -53,5 +53,5 @@ class ImageOcr:
                 self.email = '-'
             return self.tel, self.fax, self.email
         else:
-            return 'ошибка при загрузке', 'ошибка при загрузке', 'ошибка при загрузке'
+            return self.tel, self.fax, self.email
 
