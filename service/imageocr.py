@@ -4,8 +4,7 @@ import re
 import io
 import requests
 
-
-# pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+#pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 class ImageOcr:
 
@@ -18,14 +17,14 @@ class ImageOcr:
             try:
                 r = s.get(url, stream=True)
                 byteImgIO = io.BytesIO(r.content)
-                img = Image.open(byteImgIO)
+                img = Image.open(byteImgIO).convert('RGB')
                 img_crop = img.crop((405, 205, 760, 428))
                 reader = pytesseract.image_to_string(img_crop, lang='rus+eng')
                 return reader
             except Exception:
                 return None
 
-    def exstract_data(self, url):
+    def exstract_data(self, url) -> str:
         file_data = self._read_img(url)
         if file_data != None:
             format_data = ' '.join(file_data.split()).lower()
@@ -44,14 +43,43 @@ class ImageOcr:
                 self.fax = ''
             try:
                 start_idx = re.search(r'e-mail: |e-mail ', format_data)
-                format_data = format_data[start_idx.end():]
-                re_text = re.sub(r'\.', '_', format_data)
-                text = re.search(r'\w+[@|\s@]\w+\_\w+', re_text)
-                email = text.group(0)
-                self.email = email.replace('_', '.')
+                if start_idx is None:
+                    self.email = self._analyze_text(format_data)
+                else:
+                    chank_data = format_data[start_idx.end():]
+                    self.email = self._analyze_text(chank_data)
             except AttributeError:
                 self.email = '-'
             return self.tel, self.fax, self.email
         else:
             return self.tel, self.fax, self.email
+        
+    def _analyze_text(self, data: str) -> str:
+        words = []
+        word = ''
 
+        for let in data:
+            check = re.search(r'[a-z]|\@|\.', let)
+            if check:
+                word += let
+            elif let == ' ':
+                if word != '':
+                    words.append(word)
+                word = ''
+
+        variants = ()
+
+        for idx,word in enumerate(words):
+            if word.find('@') != -1:
+                variants = (word, word + words[idx+1] + ' ' + word + words[idx-1])
+                break
+        try:
+            re_text = re.sub(r'\.', '_', variants[0])
+            email_text = re.search(r'\w+\@\w+\_\w+', re_text)
+            find_text = email_text.group(0)
+            return find_text.replace('_', '.')
+        except:
+            re_text = re.sub(r'\.', '_', variants[1])
+            email_text = re.search(r'\w+\@\w+\_\w+', re_text)
+            find_text = email_text.group(0)
+            return find_text.replace('_', '.')
