@@ -9,6 +9,7 @@ from tkinter import messagebox
 from tkinter import scrolledtext
 from threading import Thread
 from loguru import logger
+import sys
 
 
 proxies = open('proxy.txt').read().split('\n')
@@ -127,7 +128,7 @@ class Parser:
                 set_info(f'Страница {self.COUNT}/{self.LEN+1}\n')
                 #http://icanhazip.com/
                 url = f'https://www1.fips.ru/registers-doc-view/fips_servlet?DB=RUTMAP&DocNumber={id}&TypeFile=html'
-                r = s.get(url=url, proxies=proxy)
+                r = s.get(url=url)
                 if r.status_code == 200: 
                     soup = BeautifulSoup(r.text, 'lxml')
                     if soup.text  == 'Документ с данным номером отсутствует':
@@ -160,6 +161,7 @@ class Parser:
                             break             
                 else:
                     set_info(r.status_code)
+                    sys.exit()
                 self.COUNT += 1
                 set_info('Ожидание следующего подключения...\n')
                 time.sleep(4)
