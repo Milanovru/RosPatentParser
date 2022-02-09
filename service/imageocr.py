@@ -30,10 +30,12 @@ class ImageOcr:
             format_data = ' '.join(file_data.split()).lower()
             try:
                 #(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}
-                tel = re.search(r'(?:\+|\d)[\d\-\(\) ]{9,}\d', format_data)
+                end_idx = re.search(r'факс: |факс ', format_data)
+                search_tel = format_data[:end_idx.start()]
+                tel = re.search(r'(?:\+|\d)[\d\-\(\) ]{9,}\d', search_tel)
                 self.tel = tel.group(0)
             except AttributeError:
-                self.tel = ''
+                self.tel = '-'
             try:
                 start_idx = re.search(r'факс: |факс ', format_data)
                 end_idx = re.search(r'e-mail: |e-mail ', format_data)
@@ -41,7 +43,7 @@ class ImageOcr:
                 fax = re.search(r'(?:\+|\d)[\d\-\(\) ]{9,}\d', search_fax)
                 self.fax = fax.group(0)
             except AttributeError:
-                self.fax = ''
+                self.fax = '-'
             try:
                 start_idx = re.search(r'e-mail: |e-mail ', format_data)
                 if start_idx is None:
@@ -49,7 +51,6 @@ class ImageOcr:
                 else:
                     chank_data = format_data[start_idx.end():]
                     self.email = self._analyze_text(chank_data)
-                print(self.email)
             except AttributeError:
                 self.email = '-'
             return self.tel, self.fax, self.email
@@ -59,7 +60,6 @@ class ImageOcr:
     def _analyze_text(self, data: str) -> str:
         words = []
         word = ''
-
         for let in data:
             check = re.search(r'[a-z]|\@|\.', let)
             if check:
@@ -78,10 +78,14 @@ class ImageOcr:
         try:
             re_text = re.sub(r'\.', '_', variants[0])
             email_text = re.search(r'\w+\@\w+\_\w+', re_text)
+            if email_text is None:
+                email_text = re.search(r'\w+\@\w+', variants[0])
             find_text = email_text.group(0)
             return find_text.replace('_', '.')
         except:
             re_text = re.sub(r'\.', '_', variants[1])
             email_text = re.search(r'\w+\@\w+\_\w+', re_text)
+            if email_text is None:
+                email_text = re.search(r'\w+\@\w+', variants[1])
             find_text = email_text.group(0)
             return find_text.replace('_', '.')
