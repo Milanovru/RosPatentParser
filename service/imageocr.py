@@ -49,6 +49,7 @@ class ImageOcr:
                 else:
                     chank_data = format_data[start_idx.end():]
                     self.email = self._analyze_text(chank_data)
+                print(self.email)
             except AttributeError:
                 self.email = '-'
             return self.tel, self.fax, self.email
