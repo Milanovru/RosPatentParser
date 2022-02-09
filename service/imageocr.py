@@ -29,7 +29,8 @@ class ImageOcr:
         if file_data != None:
             format_data = ' '.join(file_data.split()).lower()
             try:
-                tel = re.search(r'(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}', format_data)
+                #(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}
+                tel = re.search(r'(?:\+|\d)[\d\-\(\) ]{9,}\d', format_data)
                 self.tel = tel.group(0)
             except AttributeError:
                 self.tel = ''
