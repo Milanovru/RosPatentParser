@@ -38,7 +38,7 @@ class ImageOcr:
                 start_idx = re.search(r'факс: |факс ', format_data)
                 end_idx = re.search(r'e-mail: |e-mail ', format_data)
                 search_fax = format_data[start_idx.end():end_idx.start()]
-                fax = re.search(r'(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}', search_fax)
+                fax = re.search(r'(?:\+|\d)[\d\-\(\) ]{9,}\d', search_fax)
                 self.fax = fax.group(0)
             except AttributeError:
                 self.fax = ''
