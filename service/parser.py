@@ -31,7 +31,7 @@ def clear_info():
     txt.delete('1.0', END)
     
 app = Tk()
-app.title('RusPatentParser v0.2.4.1')
+app.title('RusPatentParser v0.2.5')
 app.geometry("500x400")
 app.grid_rowconfigure(0, weight=0)
 
