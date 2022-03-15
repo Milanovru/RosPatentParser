@@ -68,22 +68,24 @@ class ImageOcr:
                 word = ''
 
         variants = ()
-
-        for idx,word in enumerate(words):
-            if word.find('@') != -1:
-                variants = (word, word + words[idx+1] + ' ' + word + words[idx-1])
-                break
-        try:
-            re_text = re.sub(r'\.', '_', variants[0])
-            email_text = re.search(r'\w+\@\w+\_\w+', re_text)
-            if email_text is None:
-                email_text = re.search(r'\w+\@\w+', variants[0])
-            find_text = email_text.group(0)
-            return find_text.replace('_', '.')
-        except:
-            re_text = re.sub(r'\.', '_', variants[1])
-            email_text = re.search(r'\w+\@\w+\_\w+', re_text)
-            if email_text is None:
-                email_text = re.search(r'\w+\@\w+', variants[1])
-            find_text = email_text.group(0)
-            return find_text.replace('_', '.')
+        if variants:
+            for idx,word in enumerate(words):
+                if word.find('@') != -1:
+                    variants = (word, word + words[idx+1] + ' ' + word + words[idx-1])
+                    break
+            try:
+                re_text = re.sub(r'\.', '_', variants[0])
+                email_text = re.search(r'\w+\@\w+\_\w+', re_text)
+                if email_text is None:
+                    email_text = re.search(r'\w+\@\w+', variants[0])
+                find_text = email_text.group(0)
+                return find_text.replace('_', '.')
+            except:
+                re_text = re.sub(r'\.', '_', variants[1])
+                email_text = re.search(r'\w+\@\w+\_\w+', re_text)
+                if email_text is None:
+                    email_text = re.search(r'\w+\@\w+', variants[1])
+                find_text = email_text.group(0)
+                return find_text.replace('_', '.')
+        else:
+            return '-'
