@@ -26,7 +26,7 @@ class ImageOcr:
 
     def exstract_data(self, url) -> str:
         file_data = self._read_img(url)
-        if file_data != None:
+        if file_data:
             format_data = ' '.join(file_data.split()).lower()
             try:
                 #(\+7|8|)[\s(]*\d{3}[)\s]*\d{3}[\s-]?\d{2}[\s-]?\d{2}
